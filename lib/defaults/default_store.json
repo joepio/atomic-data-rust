@@ -525,11 +525,17 @@
         "@id": "https://atomicdata.dev/properties/localId",
         "https://atomicdata.dev/properties/datatype": "https://atomicdata.dev/datatypes/string",
         "https://atomicdata.dev/properties/description": "A `localId` is used to derive the Subject (`@id`, the URL) of an imported Resource. This is useful when some data owner has Atomic Data but does not have the technology to host all Resources at their respective URLs. [See docs](https://docs.atomicdata.dev/create-json-ad.html#preventing-duplication-with-localid).",
+        "https://atomicdata.dev/properties/shortname": "local-id"
+    },
+    {
+        "@id": "https://atomicdata.dev/properties/email",
+        "https://atomicdata.dev/properties/datatype": "https://atomicdata.dev/datatypes/string",
+        "https://atomicdata.dev/properties/description": "Primary email address ",
         "https://atomicdata.dev/properties/isA": [
             "https://atomicdata.dev/classes/Property"
         ],
         "https://atomicdata.dev/properties/parent": "https://atomicdata.dev/properties",
-        "https://atomicdata.dev/properties/shortname": "local-id"
+        "https://atomicdata.dev/properties/shortname": "email"
     },
     {
         "@id": "https://atomicdata.dev/properties/incomplete",
