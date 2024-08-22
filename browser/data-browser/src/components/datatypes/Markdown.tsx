@@ -1,5 +1,5 @@
 import ReactMarkdown from 'react-markdown';
-import { styled } from 'styled-components';
+import { css, styled } from 'styled-components';
 import remarkGFM from 'remark-gfm';
 import { Button } from '../Button';
 import { truncateMarkdown } from '../../helpers/markdown';
@@ -52,16 +52,15 @@ const Markdown: FC<Props> = ({
   );
 };
 
-const MarkdownWrapper = styled.div`
-  width: 100%;
-  overflow-x: hidden;
-  img {
-    max-width: 100%;
-  }
+Markdown.defaultProps = {
+  renderGFM: true,
+};
 
-  * {
+/** Styles shared in Markdown View & Edit renderers */
+export const markdownStyles = css`
+  /* * {
     white-space: unset;
-  }
+  } */
 
   p,
   h1,
@@ -75,6 +74,10 @@ const MarkdownWrapper = styled.div`
 
   p:only-child {
     margin-bottom: 0;
+  }
+
+  ul li {
+    margin-bottom: 1rem;
   }
 
   blockquote {
@@ -122,6 +125,16 @@ const MarkdownWrapper = styled.div`
 
     border: 1px solid ${props => props.theme.colors.bg2};
   }
+`;
+
+const MarkdownWrapper = styled.div`
+  width: 100%;
+  overflow-x: hidden;
+  img {
+    max-width: 100%;
+  }
+
+  ${markdownStyles}
 `;
 
 export default Markdown;
