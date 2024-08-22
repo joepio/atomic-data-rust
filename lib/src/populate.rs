@@ -315,7 +315,7 @@ pub fn populate_collections(store: &impl Storelike) -> AtomicResult<()> {
 pub fn populate_endpoints(store: &crate::Db) -> AtomicResult<()> {
     use crate::atomic_url::Routes;
 
-    let endpoints = crate::plugins::default_endpoints();
+    let endpoints = crate::endpoints::build_default_endpoints();
     let endpoints_collection = store.get_server_url().set_route(Routes::Endpoints);
     for endpoint in endpoints {
         let mut resource = endpoint.to_resource(store)?;
@@ -363,7 +363,6 @@ pub fn populate_all(store: &crate::Db) -> AtomicResult<()> {
         .map_err(|e| format!("Failed to create default ontology. {}", e))?;
     set_drive_rights(store, true)?;
     populate_collections(store).map_err(|e| format!("Failed to populate collections. {}", e))?;
-    populate_endpoints(store).map_err(|e| format!("Failed to populate endpoints. {}", e))?;
     populate_sidebar_items(store)
         .map_err(|e| format!("Failed to populate sidebar items. {}", e))?;
     Ok(())
