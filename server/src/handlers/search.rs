@@ -16,7 +16,7 @@ use simple_server_timing_header::Timer;
 use tantivy::{
     collector::TopDocs,
     query::{BooleanQuery, BoostQuery, Occur, Query, QueryParser, TermQuery},
-    schema::IndexRecordOption,
+    schema::{IndexRecordOption, OwnedValue},
     tokenizer::{TokenStream, Tokenizer},
     Term,
 };
@@ -263,12 +263,12 @@ fn build_parent_query(subject: &str, fields: &Fields, store: &Db) -> AtomicServe
 }
 
 fn unpack_value(
-    value: &tantivy::schema::OwnedValue,
+    value: &OwnedValue,
     document: &tantivy::TantivyDocument,
     name: String,
 ) -> Result<String, AtomicServerError> {
     match value {
-        tantivy::schema::OwnedValue::Str(s) => Ok(s.to_string()),
+        OwnedValue::Str(s) => Ok(s.to_string()),
         _else => Err(format!(
             "Search schema error: {} is not a string! Doc: {:?}",
             name, document

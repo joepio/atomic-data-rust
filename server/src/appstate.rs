@@ -52,16 +52,28 @@ impl AppState {
             tracing::warn!("Development mode is enabled. This will use staging environments for services like LetsEncrypt.");
         }
 
-        let mut store = atomic_lib::Db::init(&config.store_path, &config.server_url.clone())?;
+        let mut store = init_store(&config)?;
+
         let no_server_resource = store.get_resource(&config.server_url).is_err();
         if no_server_resource {
             tracing::warn!("Server URL resource not found. This is likely because the server URL has changed. Initializing a new database...");
         }
-        let should_init = !&config.store_path.exists() || config.initialize || no_server_resource;
-        if should_init {
+        let should_initialize =
+            !&config.store_path.exists() || config.initialize || no_server_resource;
+        if should_initialize {
             tracing::info!("Initialize: creating and populating new Database...");
             atomic_lib::populate::populate_default_store(&store)
                 .map_err(|e| format!("Failed to populate default store. {}", e))?;
+        }
+        if let Some(host) = &config.opts.smpt_host {
+            store
+                .set_smtp_config(SmtpConfig {
+                    host: host.clone(),
+                    port: config.opts.smpt_port,
+                })
+                .await?;
+        } else {
+            tracing::info!("No SMTP_HOST found, not starting email server.")
         }
 
         // Initialize search constructs
@@ -93,7 +105,7 @@ impl AppState {
 
         // If the user changes their server_url, the drive will not exist.
         // In this situation, we should re-build a new drive from scratch.
-        if should_init {
+        if should_initialize {
             atomic_lib::populate::populate_all(&store)?;
             // Building the index here is needed to perform Queries on imported resources
             let store_clone = store.clone();
@@ -191,8 +203,8 @@ fn set_default_agent(config: &Config, store: &impl Storelike) -> AtomicServerRes
         created_at: 0,
         name: None,
     };
-    store.set_default_agent(agent);
     tracing::info!("Default Agent is set: {}", &agent.subject);
+    store.set_default_agent(agent);
     Ok(())
 }
 

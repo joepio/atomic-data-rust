@@ -5,9 +5,8 @@ use actix_web::http::header::{ContentDisposition, DispositionParam, DispositionT
 use actix_web::{web, HttpResponse};
 use atomic_lib::agents::ForAgent;
 use atomic_lib::errors::AtomicResult;
-use atomic_lib::storelike::Query;
 use atomic_lib::values::SubResource;
-use atomic_lib::{urls, Db, Resource, Storelike, Value};
+use atomic_lib::{urls, Db, Query, Resource, Storelike, Value};
 use chrono::DateTime;
 use serde::Deserialize;
 

@@ -1,4 +1,4 @@
-import { useState, useMemo, memo, useContext } from 'react';
+import { memo, useContext, useMemo, useState } from 'react';
 import { Dialog, useDialog } from '../../Dialog';
 import { useSettings } from '../../../helpers/AppSettings';
 import { css, styled } from 'styled-components';
@@ -103,7 +103,12 @@ export const ResourceSelector = memo(function ResourceSelector({
   const [classSelectorOpen, setClassSelectorOpen] = useState(false);
   const [titleProp, setTitleProp] = useState<string>();
 
-  const [dialogProps, showDialog, closeDialog, isDialogOpen] = useDialog({
+  const {
+    dialogProps,
+    show: showDialog,
+    close: closeDialog,
+    isOpen: isDialogOpen,
+  } = useDialog({
     onSuccess: () => {
       setSubject(pickedSubject);
     },
