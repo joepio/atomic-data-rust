@@ -89,17 +89,30 @@ fn res_v1_to_v2(store: &Db) -> AtomicResult<()> {
     let old_key = RESOURCE_TREE_V1;
     let old = store.db.open_tree(old_key)?;
     let mut count = 0;
-
-    fn migrate_subject(subject: &str) -> String {
-        let url = url::Url::parse(subject).expect("Unable to parse subject URL");
-        if subject != url.to_string() {
-            println!("Migrating: {} -> {}", subject, url)
-        };
-        url.to_string()
-    }
+    let mut failed_subjects: Vec<String> = Vec::new();
 
     for item in old.into_iter() {
-        let (subject, resource_bin) = item.expect("Unable to convert into iterable");
+        let mut migrate_subject = |subject: &mut str| {
+            let url = match url::Url::parse(subject) {
+                Ok(url) => url,
+                Err(e) => {
+                    tracing::error!(
+                        "Unable to parse subject URL of '{}', skipping: {}",
+                        subject,
+                        e
+                    );
+                    failed_subjects.push(subject.to_string());
+                    return subject.to_string();
+                }
+            };
+
+            if subject != &url.to_string() {
+                println!("Migrating: {} -> {}", subject, url);
+            };
+            url.to_string()
+        };
+
+        let (subject, resource_bin) = item.expect("Unable to convert intos iterable");
         let subject: String = String::from_utf8_lossy(&subject).to_string();
 
         let mut propvals: PropVals = bincode::deserialize(&resource_bin)?;
@@ -124,7 +137,10 @@ fn res_v1_to_v2(store: &Db) -> AtomicResult<()> {
                 _other => {}
             };
         }
-        new.insert(migrate_subject(&subject), bincode::serialize(&propvals)?)?;
+        new.insert(
+            migrate_subject(&mut subject.clone()).as_bytes(),
+            bincode::serialize(&propvals)?,
+        )?;
         count += 1;
     }
 

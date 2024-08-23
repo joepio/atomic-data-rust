@@ -6,7 +6,8 @@ use actix_web::{web, HttpResponse};
 use atomic_lib::agents::ForAgent;
 use atomic_lib::errors::AtomicResult;
 use atomic_lib::values::SubResource;
-use atomic_lib::{urls, Db, Query, Resource, Storelike, Value};
+use atomic_lib::Query;
+use atomic_lib::{urls, Db, Resource, Storelike, Value};
 use chrono::DateTime;
 use serde::Deserialize;
 
@@ -224,18 +225,16 @@ impl<'a> CSVExporter<'a> {
     fn value_to_string(&self, value: &Value) -> String {
         match value {
             Value::Timestamp(ts) => {
-                // Convert the timestamp to a NaiveDateTime (no timezone)
                 let seconds = ts / 1000;
                 let remaining_nanoseconds = (ts % 1000) * 1_000_000; // Convert remaining milliseconds to nanoseconds
 
-                let Some(datetime) =
+                let Some(date_time) =
                     DateTime::from_timestamp(seconds, remaining_nanoseconds as u32)
                 else {
                     return ts.to_string();
                 };
 
-                // Format the DateTime<Utc> as a string in RFC3339 format (e.g., "2023-03-20T12:34:56Z")
-                datetime.to_rfc3339()
+                date_time.to_rfc3339()
             }
             Value::ResourceArray(values) => {
                 let names: Vec<String> = values
