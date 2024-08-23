@@ -61,7 +61,7 @@ impl AppState {
         let should_initialize =
             !&config.store_path.exists() || config.initialize || no_server_resource;
         if should_initialize {
-            tracing::info!("Initialize: creating and populating new Database...");
+            tracing::warn!("Initialize: creating and populating new Database...");
             atomic_lib::populate::populate_default_store(&store)
                 .map_err(|e| format!("Failed to populate default store. {}", e))?;
         }
