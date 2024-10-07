@@ -22,9 +22,6 @@ fn main() -> std::io::Result<()> {
     // return Ok(());
     const BROWSER_ROOT: &str = "../browser/";
     println!("cargo:rerun-if-changed={}", BROWSER_ROOT);
-    // Check if we're likely running in a check-like context
-    let opt_level = std::env::var("OPT_LEVEL").unwrap_or_else(|_| "0".to_string());
-    let profile = std::env::var("PROFILE").unwrap_or_else(|_| "release".to_string());
 
     let is_check_like = false; // profile == "debug" && opt_level == "0";
 

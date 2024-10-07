@@ -97,7 +97,7 @@ fn res_v1_to_v2(store: &Db) -> AtomicResult<()> {
                 Ok(url) => url,
                 Err(e) => {
                     tracing::error!(
-                        "Unable to parse subject URL of '{}', skipping: {}",
+                        "Unable to parse subject URL of '{}', keeping original: {}",
                         subject,
                         e
                     );
