@@ -250,7 +250,7 @@ mod tests {
     use super::resource_to_facet;
     #[test]
     fn facet_contains_subfacet() {
-        let store = atomic_lib::Db::init_temp("facet_contains").unwrap();
+        let store = atomic_lib::Db::init_temp().unwrap();
         let mut prev_subject: Option<String> = None;
         let mut resources = Vec::new();
 

@@ -9,7 +9,7 @@ use ntest::timeout;
 use lazy_static::lazy_static; // 1.4.0
 use std::sync::Mutex;
 lazy_static! {
-    pub static ref DB: Mutex<Db> = Mutex::new(Db::init_temp("shared").unwrap());
+    pub static ref DB: Mutex<Db> = Mutex::new(Db::init_temp().unwrap());
 }
 
 #[test]
@@ -59,7 +59,7 @@ fn basic() {
 
 #[test]
 fn populate_collections() {
-    let store = Db::init_temp("populate_collections").unwrap();
+    let store = Db::init_temp().unwrap();
     let subjects: Vec<String> = store
         .all_resources(false)
         .map(|r| r.get_subject().into())
@@ -89,7 +89,7 @@ fn populate_collections() {
 /// Check if a resource is properly removed from the DB after a delete command.
 /// Also counts commits.
 fn destroy_resource_and_check_collection_and_commits() {
-    let store = Db::init_temp("counter").unwrap();
+    let store = Db::init_temp().unwrap();
     let agents_url = store.get_server_url().set_route(Routes::Agents).to_string();
     let for_agent = &ForAgent::Public;
     let agents_collection_1 = store
@@ -198,7 +198,7 @@ fn destroy_resource_and_check_collection_and_commits() {
 
 #[test]
 fn get_extended_resource_pagination() {
-    let store = Db::init_temp("get_extended_resource_pagination").unwrap();
+    let store = Db::init_temp().unwrap();
     let subject = format!(
         "{}collections/commits?current_page=2&page_size=99999",
         store.get_server_url()
@@ -231,7 +231,7 @@ fn get_extended_resource_pagination() {
 fn queries() {
     // Re-using the same instance can cause issues with testing concurrently.
     // let store = &DB.lock().unwrap().clone();
-    let store = &Db::init_temp("queries").unwrap();
+    let store = &Db::init_temp().unwrap();
 
     let demo_val = Value::Slug("myval".to_string());
     let demo_reference = Value::AtomicUrl(urls::PARAGRAPH.into());
@@ -397,7 +397,7 @@ fn queries() {
 /// Check if `include_external` is respected.
 #[test]
 fn query_include_external() {
-    let store = &Db::init_temp("query_include_external").unwrap();
+    let store = &Db::init_temp().unwrap();
 
     let mut q = Query {
         property: Some(urls::DESCRIPTION.into()),
@@ -424,8 +424,22 @@ fn query_include_external() {
 }
 
 #[test]
+fn drop_speed() {
+    let start = std::time::Instant::now();
+    println!("Start: {:?}", start.elapsed());
+    assert!(
+        std::time::Duration::from_secs(1) > start.elapsed(),
+        "initializing DB too slow"
+    );
+    let store = Db::init_temp().unwrap();
+    println!("Init db: {:?}", start.elapsed());
+    drop(store);
+    println!("Drop db: {:?}", start.elapsed());
+}
+
+#[test]
 fn test_db_resources_all() {
-    let store = &Db::init_temp("resources_all").unwrap();
+    let store = &Db::init_temp().unwrap();
     let res_no_include = store.all_resources(false).count();
     let res_include = store.all_resources(true).count();
     assert!(
@@ -437,7 +451,7 @@ fn test_db_resources_all() {
 #[test]
 /// Changing these values actually correctly updates the index.
 fn index_invalidate_cache() {
-    let store = &Db::init_temp("invalidate_cache").unwrap();
+    let store = &Db::init_temp().unwrap();
 
     // Make sure to use Properties that are not in the default store
 

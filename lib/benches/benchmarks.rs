@@ -37,7 +37,7 @@ fn random_resource(atom: &Atom) -> Resource {
 }
 
 fn criterion_benchmark(c: &mut Criterion) {
-    let store = Db::init_temp("bench").unwrap();
+    let store = Db::init_temp().unwrap();
 
     c.bench_function("add_resource", |b| {
         b.iter(|| {

@@ -51,6 +51,7 @@ pub fn fetch_body(
     content_type: &str,
     client_agent: Option<&Agent>,
 ) -> AtomicResult<String> {
+    println!("Fetching body from {}", url);
     if !url.starts_with("http") {
         return Err(format!("Could not fetch url '{}', must start with http.", url).into());
     }

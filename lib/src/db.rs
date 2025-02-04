@@ -130,9 +130,9 @@ impl Db {
 
     /// Create a temporary Db in `.temp/db/{id}`. Useful for testing.
     /// Populates the database, creates a default agent, and sets the server_url to "http://localhost/".
-    pub fn init_temp(id: &str) -> AtomicResult<Db> {
-        let tmp_dir_path = format!(".temp/db/{}", id);
-        let _try_remove_existing = std::fs::remove_dir_all(&tmp_dir_path);
+    pub fn init_temp() -> AtomicResult<Db> {
+        let random_id = crate::utils::random_string(10);
+        let tmp_dir_path = format!(".temp/db/{}", random_id);
         let store = Db::init(std::path::Path::new(&tmp_dir_path), "https://localhost")?;
         let agent = store.create_agent(None)?;
         store.set_default_agent(agent);
@@ -557,6 +557,11 @@ impl Db {
 
 impl Drop for Db {
     fn drop(&mut self) {
+        // Remove if it's a temporary test database
+        if cfg!(test) && self.path.to_string_lossy().contains(".temp/db/") {
+            let _ = std::fs::remove_dir_all(&self.path);
+            return;
+        }
         match self.db.flush() {
             Ok(..) => (),
             Err(e) => eprintln!("Failed to flush the database: {}", e),

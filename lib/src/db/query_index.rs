@@ -494,7 +494,7 @@ pub mod test {
         let instant = std::time::Instant::now();
 
         {
-            let store = &Db::init_temp("should_update_or_not").unwrap();
+            let store = &Db::init_temp().unwrap();
 
             let prop = urls::IS_A.to_string();
             let class = urls::AGENT;
