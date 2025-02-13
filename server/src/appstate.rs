@@ -94,15 +94,6 @@ impl AppState {
         };
         store.set_handle_commit(Box::new(send_commit));
 
-        if let Some(host) = &config.opts.smpt_host {
-            store
-                .set_smtp_config(SmtpConfig {
-                    host: host.clone(),
-                    port: config.opts.smpt_port,
-                })
-                .await?;
-        };
-
         // If the user changes their server_url, the drive will not exist.
         // In this situation, we should re-build a new drive from scratch.
         if should_initialize {

@@ -52,7 +52,7 @@ pub async fn get_smtp_client(
         .port(config.port)
         .connect()
         .await
-        .map_err(|e| format!("Error connecting to SMTP mail server: at {full_address}. Is it running? Error message: {e}"))?;
+        .map_err(|e| format!("Error connecting to SMTP mail server at {full_address}. Is it running? Error message: {e}"))?;
     Ok(connection)
 }
 
