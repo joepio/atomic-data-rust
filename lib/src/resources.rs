@@ -210,15 +210,15 @@ impl Resource {
         }
     }
 
-    pub fn random_subject(store: &impl Storelike) -> String {
-        format!("{}/{}", store.get_server_url(), Ulid::new().to_string())
+    pub fn random_subject(store: &impl Storelike) -> AtomicResult<String> {
+        let server_url = store.get_server_url()?;
+        Ok(format!("{}/{}", server_url, Ulid::new().to_string()))
     }
 
     /// Create a new resource with a generated Subject
-    pub fn new_generate_subject(store: &impl Storelike) -> Resource {
-        let subject = Resource::random_subject(store);
-
-        Resource::new(subject)
+    pub fn new_generate_subject(store: &impl Storelike) -> AtomicResult<Resource> {
+        let subject = Resource::random_subject(store)?;
+        Ok(Resource::new(subject))
     }
 
     /// Create a new instance of some Class.
@@ -229,7 +229,7 @@ impl Resource {
         let class = store.get_class(class_url)?;
         let subject = format!(
             "{}/{}/{}",
-            store.get_server_url(),
+            store.get_server_url()?,
             &class.shortname,
             random_string(10)
         );
@@ -781,7 +781,7 @@ mod test {
         let store = init_store();
         let property: String = urls::CHILDREN.into();
         let append_value = "http://localhost/someURL";
-        let mut resource = Resource::new_generate_subject(&store);
+        let mut resource = Resource::new_generate_subject(&store).unwrap();
         resource
             .push(&property, append_value.into(), false)
             .unwrap();
@@ -807,11 +807,11 @@ mod test {
     #[test]
     fn get_children() {
         let store = init_store();
-        let mut resource1 = Resource::new_generate_subject(&store);
+        let mut resource1 = Resource::new_generate_subject(&store).unwrap();
         let subject1 = resource1.get_subject().to_string();
         resource1.save_locally(&store).unwrap();
 
-        let mut resource2 = Resource::new_generate_subject(&store);
+        let mut resource2 = Resource::new_generate_subject(&store).unwrap();
         resource2
             .set(urls::PARENT.into(), Value::AtomicUrl(subject1), &store)
             .unwrap();
@@ -829,11 +829,11 @@ mod test {
         let store = init_store();
         // Create 3 resources in a tree structure.
 
-        let mut resource1 = Resource::new_generate_subject(&store);
+        let mut resource1 = Resource::new_generate_subject(&store).unwrap();
         let subject1 = resource1.get_subject().to_string();
         resource1.save_locally(&store).unwrap();
 
-        let mut resource2 = Resource::new_generate_subject(&store);
+        let mut resource2 = Resource::new_generate_subject(&store).unwrap();
         resource2
             .set(
                 urls::PARENT.into(),
@@ -844,7 +844,7 @@ mod test {
         let subject2 = resource2.get_subject().to_string();
         resource2.save_locally(&store).unwrap();
 
-        let mut resource3 = Resource::new_generate_subject(&store);
+        let mut resource3 = Resource::new_generate_subject(&store).unwrap();
         let resource3_subject = resource3.get_subject().to_string();
 
         resource3
