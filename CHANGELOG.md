@@ -8,6 +8,8 @@ See [STATUS.md](server/STATUS.md) to learn more about which features will remain
 ## UNRELEASED
 
 - CLI should use Agent in requests - get #986
+- Search endpoint throws error for websocket requests #1047
+- Fix search in CLI / atomic_lib #958
 
 ## [v0.40.2]
 
